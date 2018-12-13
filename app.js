@@ -18,7 +18,7 @@ const addressInput = encodeURIComponent(argv.a);
 console.log(addressInput);
 
 request({
-    url: `http://www.mapquestapi.com/geocoding/v1/address?key=XenCxMaTYWNp2tUNaDeyMJdMBie4637W&location=${addressInput}`,
+    url: `${addressInput}`,
     json: true
 }, (error, response, body) => {
     //  console.log(JSON.stringify(body, undefined, 2));
