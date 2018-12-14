@@ -1,5 +1,6 @@
-const request = require ('request');
 const yargs = require ('yargs');
+const geocode = require('./geocode/geocode');
+const weather = require('./weather/weather');
 
 const argv = yargs
 .options({
@@ -10,26 +11,24 @@ const argv = yargs
         string: true
     }
 })
-.   help()
+.help()
 .alias('help', 'h')
 .argv;
 
-const addressInput = encodeURIComponent(argv.a);
+geocode.geocodeAddress(argv.a, (errorMessage, results) =>{
+    if(errorMessage){
+        console.log(errorMessage);
+    }else{
+        console.log(results.address);
+        weather.getWeather(results.latitude, results.longitude, (errorMessage, weatherResults) => {
+            if(errorMessage){
+                console.log(errorMessage);
+            } else {
+                console.log(`Its currently ${weatherResults.temperature}. It feels like ${weatherResults.apparentTemperature }`);
+            }
+        });
+    }
+});
 
 
-request({
-    url:`http://www.mapquestapi.com/geocoding/v1/address?key=XenCxMaTYWNp2tUNaDeyMJdMBie4637W&location=${addressInput}`,
-    json:true
-}, (error, response, body) => {
-      if(error){
-         console.log('Unable to connect to map quest servers');
-      }else if(body.results[0].locations[0].adminArea5) {
-        console.log(`Address:   ${body.results[0].providedLocation.location}`);
-        console.log(`Latitude:  ${body.results[0].locations[0].latLng.lat}`);
-        console.log(`Longitude: ${body.results[0].locations[0].latLng.lng}`); 
-      }else{
-        console.log('Unable to find the address');
-      }
-    
 
-})
